@@ -628,9 +628,8 @@ const LANGS = [
       ['Архитектура проекта', '/* index.html, style.css, script.js */', 'Организация файлов сайта.'],
       ['Мини-проект: Лендинг-визитка', '<!-- Сборка готового адаптивного сайта -->', 'Финальная верстка страницы.']
     ]
-  }
-];
-{
+  },
+  {
     id: 'lua', name: 'Lua', color: '#000080', on: '#fff', tag: 'Встраиваемый и быстрый язык',
     about: 'Сверхлегкий и быстрый язык скриптов. Используется для моддинга игр (например, Roblox, World of Warcraft), игр на Love2D и встраивания в софт.',
     note: 'Запуск: lua main.lua', file: ['main.lua'],
@@ -769,7 +768,7 @@ const LANGS = [
       ['Трейты (Traits)', 'trait Greeter { def greet() = println("Привет") }\nclass Person extends Greeter\nnew Person().greet()', 'Интерфейсы с возможностью реализации методов (миксины).'],
       ['Option (Безопасность null)', 'val name: Option[String] = Some("Аня")\nval len = name.getOrElse("Гость").length\nprintln(len)', 'Элегантная замена null через Option, Some и None.'],
       ['Try / Success / Failure', 'import scala.util.{Try, Success, Failure}\nval res = Try("123".toInt)\nres match {\n  case Success(v) => println(v)\n  case Failure(_) => println("Ошибка")\n}', 'Безопасный перехват исключений в функциональном стиле.'],
-      ['Словари (Map)', 'val map = Map("Аня" -> 20, "Иван" /-> 25)\nprintln(map.get("Аня"))', 'Хранение пар ключ-значение.'],
+      ['Словари (Map)', 'val map = Map("Аня" -> 20, "Иван" -> 25)\nprintln(map.get("Аня"))', 'Хранение пар ключ-значение.'],
       ['For-comprehensions (Генераторы)', 'val result = for {\n  x <- List(1, 2)\n  y <- List(10, 20)\n} yield x * y\nprintln(result)', 'Мощный синтаксис для работы с коллекциями и Future.'],
       ['Асинхронность (Future)', 'import scala.concurrent.Future\nimport scala.concurrent.ExecutionContext.Implicits.global\nval f = Future { "Данные" }', 'Неблокирующие асинхронные вычисления.'],
       ['Паттерн Matching по типам', 'def check(x: Any): String = x match {\n  case s: String => "Строка"\n  case i: Int => "Число"\n  case _ => "Другое"\n}\nprintln(check(42))', 'Проверка типов данных прямо в match.'],
@@ -778,7 +777,7 @@ const LANGS = [
       ['Мини-проект: Анализ списка', 'val scores = List(85, 92, 78, 95)\nprintln(s"Средний балл: ${scores.sum / scores.size}")', 'Итоговый скрипт обработки данных.']
     ]
   },
-{
+  {
     id: 'haskell', name: 'Haskell', color: '#5e5086', on: '#fff', tag: 'Чистый функциональный язык',
     about: 'Строгая статическая типизация, ленивые вычисления и абсолютная чистота функций без побочных эффектов.',
     note: 'Запуск: runghc main.hs', file: ['main.hs'],
@@ -831,7 +830,7 @@ const LANGS = [
       ['Создание классов (.h интерфейс)', '@interface Dog : NSObject\n@property NSString *name;\n- (void)bark;\n@end', 'Объявление класса в заголовочном файле.'],
       ['Реализация классов (.m файл)', '@implementation Dog\n- (void)bark {\n    NSLog(@"%@ гавкает", self.name);\n}\n@end', 'Написание логики методов.'],
       ['Инициализация объектов (init)', 'Dog *d = [[Dog alloc] init];\nd.name = @"Рекс";', 'Выделение памяти (alloc) и инициализация (init).'],
-      ['Кастомные конструкторы', '- (inst5ancetype)initWithName:(NSString *)name {\n    self = [super init];\n    if (self) _name = name;\n    return self;\n}', 'Создание конструкторов с параметрами.'],
+      ['Кастомные конструкторы', '- (instancetype)initWithName:(NSString *)name {\n    self = [super init];\n    if (self) _name = name;\n    return self;\n}', 'Создание конструкторов с параметрами.'],
       ['Условия if / else', 'if (age >= 18) {\n    NSLog(@"Взрослый");\n}', 'Ветвление логики.'],
       ['Цикл for / for-in', 'for (NSString *item in arr) {\n    NSLog(@"%@", item);\n}', 'Быстрый обход коллекций.'],
       ['Цикл while', 'int n = 3;\nwhile (n > 0) n--;', 'Цикл с условием.'],
@@ -926,4 +925,4 @@ const LANGS = [
       ['Мини-проект: Текстовый парсер', 'print "Парсинг завершен\\n";', 'Итоговый скрипт.']
     ]
   }
-
+];
