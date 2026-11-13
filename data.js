@@ -767,7 +767,7 @@ const LANGS = [
       ['Срезы (Slices)', 'let slice = &a[1..3];', 'Представление части массива.'],
       ['Методы структур (impl)', 'impl User { fn is_adult(&self) -> bool { self.age >= 18 } }', 'Привязка методов к структурам.'],
       ['Обобщения (Generics)', 'fn largest<T: PartialOrd>(list: &[T]) -> &T {}', 'Универсальные типы.'],
-      ['Жизненные циклы (Lifetimes)', 'fn longest<'a>(x: '&a str, y: '&a str) -> '&a str {}', 'Контроль времени жизни ссылок.'],
+      ['Жизненные циклы (Lifetimes)', 'fn longest<\'a>(x: \'&a str, y: \'&a str) -> \'&a str {}', 'Контроль времени жизни ссылок.'],
       ['Замыкания (Closures)', 'let add = |x| x + 1;', 'Лямбда-функции в Rust.'],
       ['Итераторы', 'let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();', 'Функциональная обработка коллекций.'],
       ['Умный указатель Rc и Arc', 'use std::rc::Rc;\nlet rc = Rc::new(5);', 'Множественное владение данными.'],
