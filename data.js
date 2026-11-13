@@ -1310,7 +1310,7 @@ const LANGS = [
       ['Конвейеры (Pipe |)', 'cat file.txt | grep "error"', 'Передача данных между командами.'],
       ['Утилита grep', 'grep -r "TODO" ./src', 'Поиск паттернов в файлах.'],
       ['Утилита sed', 'sed -i "s/old/new/g" file.txt', 'Замена текста в файлах.'],
-      ['Утилита awk', 'awk '{print $1}' file.txt', 'Извлечение колонок текста.'],
+      ['Утилита awk', "awk '{print $1}' file.txt", 'Извлечение колонок текста.'],
       ['Утилита find', 'find . -name "*.txt" -mtime -7', 'Поиск файлов по критериям.'],
       ['Утилита xargs', 'find . -name "*.log" | xargs rm', 'Передача аргументов командам.'],
       ['Архивация (tar)', 'tar -czf archive.tar.gz folder/', 'Создание архивов.'],
