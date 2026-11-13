@@ -1,12 +1,10 @@
-javascript
 const $ = id => document.getElementById(id);
-const META = { // id: [категория, сложность 1-3, значок]
-  python:['Универсальные',1,'Py'],javascript:['Веб',1,'JS'],typescript:['Веб',2,'TS'],java:['Универсальные',2,'Jv'],
-  csharp:['Универсальные',2,'C#'],go:['Системные',2,'Go'],rust:['Системные',3,'Rs'],cpp:['Системные',3,'C++'],
-  php:['Веб',1,'PHP'],kotlin:['Мобильные',2,'Kt'],swift:['Мобильные',2,'Sw'],dart:['Мобильные',2,'Da'],
-  ruby:['Скрипты',1,'Rb'],sql:['Данные',1,'SQL'],bash:['Скрипты',1,'sh'],
-  r:['Данные',2,'R'],html:['Веб',1,'</>'],lua:['Системные',2,'Lua'],
-  clojure:['Универсальные',3,'Clj'],scala:['Универсальные',3,'Sc']
+const META = { 
+  python:['Универсальные',1,'Py'],javascript:['Веб',1,'JS'],typescript:['Веб',2,'TS'],cpp:['Системные',3,'C++'],
+  csharp:['Универсальные',2,'C#'],java:['Универсальные',2,'Jv'],go:['Системные',2,'Go'],rust:['Системные',3,'Rs'],
+  php:['Веб',1,'PHP'],kotlin:['Мобильные',2,'Kt'],swift:['Мобильные',2,'Sw'],ruby:['Скрипты',1,'Rb'],
+  sql:['Данные',1,'SQL'],bash:['Системные',1,'sh'],htmlcss:['Веб',1,'</>'],gitmd:['Документация',1,'Git'],
+  scala:['Универсальные',3,'Sc'],lua:['Системные',2,'Lua'],dart:['Мобильные',2,'Da'],perl:['Скрипты',2,'Pl']
 };
 const LEVEL = ['', 'Легко', 'Средне', 'Сложно'];
 const CATS = ['Все', ...new Set(Object.values(META).map(m => m[0]))];
@@ -32,8 +30,6 @@ function renderHome() {
   const list = LANGS.filter(l => (cat === 'Все' || META[l.id][0] === cat) &&
     (l.name + ' ' + l.tag).toLowerCase().includes(q));
   $('grid').innerHTML = '';
-  
-  let completedLangsCount = 0;
 
   list.forEach(l => {
     const m = META[l.id], b = document.createElement('button');
@@ -42,15 +38,13 @@ function renderHome() {
     const dCount = doneCount(l);
     const totalLessons = l.lessons.length;
     const percent = Math.round((dCount / totalLessons) * 100);
-    const isFullyCompleted = dCount >= totalLessons && totalLessons > 0;
-    if (isFullyCompleted) completedLangsCount++;
 
     b.innerHTML = `
       <div class="tile">${esc(m[2])}</div>
       <b>${l.name}</b>
       <span>${l.tag}</span>
       <span class="card-meta">${m[0]} · ${LEVEL[m[1]]} · ${dCount}/${totalLessons}</span>
-      <div class="home-meter"><div class="home-meter-bar" style="width: ${percent}%"></div></div>
+      <div class="bar2"><i style="width: ${percent}%"></i></div>
     `;
     b.onclick = () => { location.hash = l.id; };
     $('grid').append(b);
@@ -59,13 +53,12 @@ function renderHome() {
   $('empty').hidden = list.length > 0;
   const total = LANGS.reduce((n, l) => n + l.lessons.length, 0);
   
-  // Подсчитываем общие завершенные языки по всему списку LANGS
   let totalCompleted = 0;
   LANGS.forEach(l => {
     if (doneCount(l) >= l.lessons.length && l.lessons.length > 0) totalCompleted++;
   });
 
-  $('stats').textContent = `Пройдено языков: ${totalCompleted} из ${LANGS.length}. Всего ${total} уроков в ${LANGS.length} языках. Прогресс сохраняется в браузере.`;
+  $('stats').textContent = `Пройдено языков: ${totalCompleted} из ${LANGS.length}. Всего ${total} уроков в ${LANGS.length} технологиях. Прогресс сохраняется в браузере.`;
 }
 
 function renderLang() {
@@ -86,8 +79,16 @@ function renderLang() {
   $('code').innerHTML = hi(lang.lessons[lesson][1]);
   const L = lang.lessons[lesson];
   $('ltitle').textContent = `${lesson + 1}. ${L[0]}`; $('ltext').textContent = L[2] || '';
-  $('video').innerHTML = L[3] ? `<iframe src="https://www.youtube-nocookie.com/embed/${L[3]}" title="Видеоурок" loading="lazy" allowfullscreen></iframe>` : '';
-  $('yt').href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${lang.name} ${L[0]} урок`);
+  
+  const videoEl = $('video');
+  if (videoEl) {
+    videoEl.innerHTML = L[3] ? `<iframe src="https://www.youtube-nocookie.com/embed/${L[3]}" title="Видеоурок" loading="lazy" allowfullscreen></iframe>` : '';
+  }
+  const ytEl = $('yt');
+  if (ytEl) {
+    ytEl.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${lang.name} ${L[0]} урок`);
+  }
+
   $('note').textContent = lang.note + (lang.lessons.length < 100 ? ` Курс ещё пополняется: сейчас ${lang.lessons.length} из 100 уроков.` : ' Курс содержит полный комплект из 100 подробных уроков.'); $('jump').value = lang.id;
   $('prev').disabled = lesson === 0; $('next').disabled = lesson === lang.lessons.length - 1;
   $('done').textContent = d[lesson] ? 'Отменить «изучено»' : 'Отметить изученным';
@@ -137,34 +138,3 @@ addEventListener('keydown', e => {
 });
 addEventListener('hashchange', route);
 route();
-```[cite: 2]
-
----
-
-
-
-
-
-```css
-/* Стили для полоски прогресса в карточках */
-.home-meter {
-  width: 100%;
-  height: 6px;
-  background: rgba(128, 128, 128, 0.2);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.home-meter-bar {
-  height: 100%;
-  background: var(--c, #7c8cff);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-
-.card span.card-meta {
-  font-size: 13px;
-  opacity: 0.8;
-  margin-top: 2px;
-}
