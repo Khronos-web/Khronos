@@ -259,7 +259,7 @@ function renderLang() {
   copyBtn.onclick = () => {
     navigator.clipboard.writeText(lesson[1]).then(() => {
       copyBtn.textContent = 'Скопировано!';
-      setTimeout(() => copyBtn.textName = 'Копировать', 1500);
+      setTimeout(() => copyBtn.textContent = 'Копировать', 1500);
     });
   };
 
