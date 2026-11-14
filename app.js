@@ -144,11 +144,10 @@ function renderGrid() {
     const done = prog.filter(Boolean).length;
     const total = l.lessons.length;
     const pct = total > 0 ? (done / total) * 100 : 0;
-    const shortName = l.name.length > 6 ? l.name.slice(0, 5) + '.' : l.name;
 
     return `
       <button class="card" type="button" data-id="${l.id}" style="--c:${l.color}; --o:${l.on}">
-        <div class="tile">${shortName}</div>
+        <div class="tile">${l.name}</div>
         <b>${l.name}</b>
         <span>${l.tag}</span>
         <div class="bar2"><i style="width:${pct}%"></i></div>
@@ -181,7 +180,7 @@ function renderLang() {
 
   document.title = `${lang.name} — Хрона кода`;
 
-  $('glyph').textContent = lang.name.length > 5 ? lang.name.slice(0, 4) + '.' : lang.name;
+  $('glyph').textContent = lang.name;
   $('glyph').style.background = lang.color;
   $('glyph').style.color = lang.on;
 
@@ -198,7 +197,6 @@ function renderLang() {
   $('meter').style.background = lang.color;
   $('prog').textContent = `Пройдено уроков: ${done} из ${total}`;
 
-  // Текущий урок (без списка всех уроков)
   const lesson = lang.lessons[state.lesson];
   const isLessonDone = !!prog[state.lesson];
 
@@ -243,7 +241,6 @@ function renderLang() {
 
   $('note').textContent = lang.note;
 
-  // Video search
   const query = encodeURIComponent(`${lang.name} урок ${lesson[0]}`);
   $('yt').href = `https://www.youtube.com/results?search_query=${query}`;
   $('video').innerHTML = '';
