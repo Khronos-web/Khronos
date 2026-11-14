@@ -18,8 +18,20 @@
 </header>
 
 <main id="home">
-  <h1>Выбери язык, <br>с которого начнёшь</h1>
-  <p class="lead" id="stats"></p>
+  <div class="home-head">
+    <div>
+      <h1>Выбери язык, <br>с которого начнёшь</h1>
+      <p class="lead" id="stats"></p>
+    </div>
+    <div class="rank-box" aria-label="Общий прогресс обучения">
+      <div class="rank-top">Выучено</div>
+      <div class="rank-bar">
+        <i id="rank-fill"></i>
+        <span id="rank-count">0 / 20</span>
+      </div>
+      <div class="rank-title" id="rank-title">Новичок</div>
+    </div>
+  </div>
   <div class="tools">
     <input id="q" type="search" placeholder="Найти язык (нажми /)" aria-label="Поиск языка">
     <button id="rnd" type="button">Случайный язык</button>
