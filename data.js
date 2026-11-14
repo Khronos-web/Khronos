@@ -425,7 +425,7 @@ const LANGS = [
     ]
   },
   {
-    id: 'csharp', name: 'C#', color: '#178600', on: '#fff', tag: 'Платформа .NET',
+    id: 'csharp', name: 'C#', color: '#512BD4', on: '#fff', tag: 'Платформа .NET',
     about: 'Современный, мощный и объектно-ориентированный язык от Microsoft для игр (Unity), веб- и десктоп-приложений.',
     note: 'Запуск: dotnet run', file: ['Program.cs'],
     lessons: [
