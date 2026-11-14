@@ -198,33 +198,24 @@ function renderLang() {
   $('meter').style.background = lang.color;
   $('prog').textContent = `Пройдено уроков: ${done} из ${total}`;
 
-  // Tabs
-  const tabs = $('tabs');
-  tabs.innerHTML = lang.lessons.map((les, idx) => `
-    <button type="button" role="tab" aria-selected="${idx === state.lesson}" data-idx="${idx}">
-      ${prog[idx] ? '✓ ' : ''}${idx + 1}. ${les[0]}
-    </button>
-  `).join('');
-
-  tabs.querySelectorAll('button').forEach(btn => {
-    btn.onclick = () => {
-      state.lesson = parseInt(btn.dataset.idx, 10);
-      renderLang();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-  });
-
+  // Текущий урок (без списка всех уроков)
   const lesson = lang.lessons[state.lesson];
-  $('ltitle').textContent = `${state.lesson + 1}. ${lesson[0]}`;
+  const isLessonDone = !!prog[state.lesson];
+
+  const badge = $('lesson-num-badge');
+  if (badge) {
+    badge.textContent = `Урок ${state.lesson + 1} из ${total}${isLessonDone ? ' (Выучено ✓)' : ''}`;
+  }
+
+  $('ltitle').textContent = lesson[0];
   $('ltext').textContent = lesson[2];
   $('code').textContent = lesson[1];
   $('file').textContent = lang.file[0] || 'code';
 
-  const isDone = !!prog[state.lesson];
   const doneBtn = $('done');
-  doneBtn.textContent = isDone ? '✓ Выучено' : 'Отметить как выученное';
-  doneBtn.style.background = isDone ? '#2ea043' : '';
-  doneBtn.style.color = isDone ? '#fff' : '';
+  doneBtn.textContent = isLessonDone ? '✓ Выучено' : 'Отметить как выученное';
+  doneBtn.style.background = isLessonDone ? '#2ea043' : '';
+  doneBtn.style.color = isLessonDone ? '#fff' : '';
   doneBtn.onclick = () => {
     if (!state.progress[lang.id]) state.progress[lang.id] = [];
     state.progress[lang.id][state.lesson] = !state.progress[lang.id][state.lesson];
@@ -237,6 +228,7 @@ function renderLang() {
     if (state.lesson > 0) {
       state.lesson--;
       renderLang();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -245,6 +237,7 @@ function renderLang() {
     if (state.lesson < lang.lessons.length - 1) {
       state.lesson++;
       renderLang();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
