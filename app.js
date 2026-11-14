@@ -1,143 +1,296 @@
 const $ = id => document.getElementById(id);
-const META = { 
-  python:['Универсальные',1,'Py'],javascript:['Веб',1,'JS'],typescript:['Веб',2,'TS'],cpp:['Системные',3,'C++'],
-  csharp:['Универсальные',2,'C#'],java:['Универсальные',2,'Jv'],go:['Системные',2,'Go'],rust:['Системные',3,'Rs'],
-  php:['Веб',1,'PHP'],kotlin:['Мобильные',2,'Kt'],swift:['Мобильные',2,'Sw'],ruby:['Скрипты',1,'Rb'],
-  sql:['Данные',1,'SQL'],bash:['Системные',1,'sh'],htmlcss:['Веб',1,'</>'],gitmd:['Документация',1,'Git'],
-  scala:['Универсальные',3,'Sc'],lua:['Системные',2,'Lua'],dart:['Мобильные',2,'Da'],perl:['Скрипты',2,'Pl'],basic:['Универсальные',1,'BAS']
-};
-const LEVEL = ['', 'Легко', 'Средне', 'Сложно'];
-const CATS = ['Все', ...new Set(Object.values(META).map(m => m[0]))];
-const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const hi = s => esc(s)
-  .replace(/"(?:[^"\n])*"/g, m => `<span class="s">${m}</span>`)
-  .replace(/^(\s*(?:\/\/|#(?!include)|--).*)$/gm, '<span class="c">$1</span>');
-const store = {
-  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-};
-let done = store.get('cp-done', {}), cat = 'Все', lang, lesson = 0;
-const doneCount = l => (done[l.id] || []).filter(Boolean).length;
 
-function setAccent(c, o) {
-  const r = document.documentElement.style;
-  r.setProperty('--accent', c); r.setProperty('--on', o);
+let state = {
+  lang: null,
+  lesson: 0,
+  filter: 'all',
+  search: '',
+  progress: JSON.parse(localStorage.getItem('chrona_progress') || '{}'),
+  theme: localStorage.getItem('chrona_theme') || 'dark'
+};
+
+document.documentElement.setAttribute('data-theme', state.theme);
+
+function save() {
+  localStorage.setItem('chrona_progress', JSON.stringify(state.progress));
+}
+
+function getRank(completed) {
+  if (completed >= 20) return 'Мастер кода';
+  if (completed >= 15) return 'Специалист';
+  if (completed >= 10) return 'Практик';
+  if (completed >= 5) return 'Ученик';
+  return 'Новичок';
+}
+
+function initTheme() {
+  const btn = $('theme');
+  if (btn) {
+    btn.onclick = () => {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      localStorage.setItem('chrona_theme', state.theme);
+    };
+  }
+}
+
+function initJump() {
+  const sel = $('jump');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Выбрать язык...</option>' + LANGS.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+  sel.onchange = (e) => {
+    if (e.target.value) {
+      location.hash = '#' + e.target.value;
+      sel.value = '';
+    }
+  };
 }
 
 function renderHome() {
-  setAccent('#7c8cff', '#fff'); document.title = 'Хрона кода — учим языки программирования';
-  const q = $('q').value.trim().toLowerCase();
-  const list = LANGS.filter(l => {
-    const m = META[l.id] || ['Другое', 1, l.name.slice(0, 3)];
-    return (cat === 'Все' || m[0] === cat) &&
-      (l.name + ' ' + l.tag).toLowerCase().includes(q);
-  });
-  $('grid').innerHTML = '';
+  $('home').hidden = false;
+  $('lang').hidden = true;
+  document.title = 'Хрона кода — языки программирования';
 
-  list.forEach(l => {
-    const m = META[l.id] || ['Другое', 1, l.name.slice(0, 3)], b = document.createElement('button');
-    b.className = 'card'; b.style.cssText = `--c:${l.color};--o:${l.on}`;
-    
-    const dCount = doneCount(l);
-    const totalLessons = l.lessons.length;
-    const percent = Math.round((dCount / totalLessons) * 100);
-
-    b.innerHTML = `
-      <div class="tile">${esc(m[2])}</div>
-      <b>${l.name}</b>
-      <span>${l.tag}</span>
-      <span class="card-meta">${m[0]} · ${LEVEL[m[1]]} · ${dCount}/${totalLessons}</span>
-      <div class="bar2"><i style="width: ${percent}%"></i></div>
-    `;
-    b.onclick = () => { location.hash = l.id; };
-    $('grid').append(b);
-  });
-
-  $('empty').hidden = list.length > 0;
-  const total = LANGS.reduce((n, l) => n + l.lessons.length, 0);
-  
+  let totalLessons = 0;
+  let completedLessons = 0;
   let totalCompleted = 0;
+
   LANGS.forEach(l => {
-    if (doneCount(l) >= l.lessons.length && l.lessons.length > 0) totalCompleted++;
+    const prog = state.progress[l.id] || [];
+    const len = l.lessons.length;
+    totalLessons += len;
+    const doneCount = prog.filter(Boolean).length;
+    completedLessons += doneCount;
+    if (len > 0 && doneCount >= len) {
+      totalCompleted++;
+    }
   });
 
-  $('stats').textContent = `Пройдено языков: ${totalCompleted} из ${LANGS.length}. Всего ${total} уроков в ${LANGS.length} технологиях. Прогресс сохраняется в браузере.`;
+  $('stats').textContent = `Пройдено языков: ${totalCompleted} из ${LANGS.length}. Всего ${completedLessons} из ${totalLessons} уроков в ${LANGS.length} технологиях. Прогресс сохраняется в браузере.`;
+
+  const maxLangs = LANGS.length;
+  const rankPercent = maxLangs > 0 ? Math.min(100, (totalCompleted / maxLangs) * 100) : 0;
+  const rankFill = $('rank-fill');
+  if (rankFill) {
+    rankFill.style.width = rankPercent + '%';
+    $('rank-count').textContent = `${totalCompleted} / ${maxLangs}`;
+    $('rank-title').textContent = getRank(totalCompleted);
+  }
+
+  // Chips
+  const cats = [
+    { id: 'all', name: 'Все' },
+    { id: 'Универсальные', name: 'Универсальные' },
+    { id: 'Веб', name: 'Веб' },
+    { id: 'Системные', name: 'Системные' },
+    { id: 'Мобильные', name: 'Мобильные' },
+    { id: 'Скрипты', name: 'Скрипты' },
+    { id: 'Данные', name: 'Данные' },
+    { id: 'Документация', name: 'Документация' }
+  ];
+
+  $('chips').innerHTML = cats.map(c => `
+    <button type="button" aria-pressed="${state.filter === c.id}" data-cat="${c.id}">${c.name}</button>
+  `).join('');
+
+  $('chips').querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      state.filter = btn.dataset.cat;
+      renderGrid();
+      renderHomeChipsState();
+    };
+  });
+
+  const q = $('q');
+  if (q) {
+    q.value = state.search;
+    q.oninput = (e) => {
+      state.search = e.target.value.toLowerCase().trim();
+      renderGrid();
+    };
+  }
+
+  const rnd = $('rnd');
+  if (rnd) {
+    rnd.onclick = () => {
+      const randomLang = LANGS[Math.floor(Math.random() * LANGS.length)];
+      location.hash = '#' + randomLang.id;
+    };
+  }
+
+  renderGrid();
+}
+
+function renderHomeChipsState() {
+  $('chips').querySelectorAll('button').forEach(btn => {
+    btn.setAttribute('aria-pressed', btn.dataset.cat === state.filter ? 'true' : 'false');
+  });
+}
+
+function renderGrid() {
+  const grid = $('grid');
+  const empty = $('empty');
+
+  const filtered = LANGS.filter(l => {
+    const matchCat = state.filter === 'all' || l.tag.toLowerCase().includes(state.filter.toLowerCase()) || (l.category && l.category === state.filter);
+    const matchSearch = l.name.toLowerCase().includes(state.search) || l.tag.toLowerCase().includes(state.search);
+    return matchCat && matchSearch;
+  });
+
+  empty.hidden = filtered.length > 0;
+
+  grid.innerHTML = filtered.map(l => {
+    const prog = state.progress[l.id] || [];
+    const done = prog.filter(Boolean).length;
+    const total = l.lessons.length;
+    const pct = total > 0 ? (done / total) * 100 : 0;
+    const shortName = l.name.length > 6 ? l.name.slice(0, 5) + '.' : l.name;
+
+    return `
+      <button class="card" type="button" data-id="${l.id}" style="--c:${l.color}; --o:${l.on}">
+        <div class="tile">${shortName}</div>
+        <b>${l.name}</b>
+        <span>${l.tag}</span>
+        <div class="bar2"><i style="width:${pct}%"></i></div>
+        <span style="font-size:.8rem">${done} / ${total}</span>
+      </button>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.card').forEach(card => {
+    card.onclick = () => {
+      location.hash = '#' + card.dataset.id;
+    };
+  });
 }
 
 function renderLang() {
-  const m = META[lang.id] || ['Другое', 1, lang.name.slice(0, 3)], d = done[lang.id] || [];
-  setAccent(lang.color, lang.on); document.title = lang.name + ' — Хрона кода';
-  $('glyph').textContent = m[2]; $('name').textContent = lang.name;
-  $('tag').textContent = lang.tag; $('about').textContent = lang.about;
-  $('meter').style.width = doneCount(lang) / lang.lessons.length * 100 + '%';
-  $('prog').textContent = `${m[0]} · ${LEVEL[m[1]]} · изучено ${doneCount(lang)} из ${lang.lessons.length}`;
-  $('tabs').innerHTML = '';
-  lang.lessons.forEach(([t], i) => {
-    const b = document.createElement('button');
-    b.textContent = lang.lessons.length > 8 ? (d[i] ? '✓' : i + 1) : (d[i] ? '✓ ' : '') + t; b.title = t; b.setAttribute('role', 'tab');
-    b.setAttribute('aria-selected', i === lesson); b.onclick = () => { lesson = i; renderLang(); };
-    $('tabs').append(b);
+  const hash = location.hash.slice(1);
+  const lang = LANGS.find(l => l.id === hash);
+
+  if (!lang) {
+    location.hash = '';
+    return;
+  }
+
+  state.lang = lang;
+  if (state.lesson >= lang.lessons.length) state.lesson = 0;
+
+  $('home').hidden = true;
+  $('lang').hidden = false;
+
+  document.title = `${lang.name} — Хрона кода`;
+
+  $('glyph').textContent = lang.name.length > 5 ? lang.name.slice(0, 4) + '.' : lang.name;
+  $('glyph').style.background = lang.color;
+  $('glyph').style.color = lang.on;
+
+  $('name').textContent = lang.name;
+  $('tag').textContent = lang.tag;
+  $('about').textContent = lang.about;
+
+  const prog = state.progress[lang.id] || [];
+  const done = prog.filter(Boolean).length;
+  const total = lang.lessons.length;
+  const pct = total > 0 ? (done / total) * 100 : 0;
+
+  $('meter').style.width = `${pct}%`;
+  $('meter').style.background = lang.color;
+  $('prog').textContent = `Пройдено уроков: ${done} из ${total}`;
+
+  // Tabs
+  const tabs = $('tabs');
+  tabs.innerHTML = lang.lessons.map((les, idx) => `
+    <button type="button" role="tab" aria-selected="${idx === state.lesson}" data-idx="${idx}">
+      ${prog[idx] ? '✓ ' : ''}${idx + 1}. ${les[0]}
+    </button>
+  `).join('');
+
+  tabs.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      state.lesson = parseInt(btn.dataset.idx, 10);
+      renderLang();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
   });
-  $('file').textContent = lang.file[lesson] || lang.file[0];
-  $('code').innerHTML = hi(lang.lessons[lesson][1]);
-  const L = lang.lessons[lesson];
-  $('ltitle').textContent = `${lesson + 1}. ${L[0]}`; $('ltext').textContent = L[2] || '';
-  
-  const videoEl = $('video');
-  if (videoEl) {
-    videoEl.innerHTML = L[3] ? `<iframe src="https://www.youtube-nocookie.com/embed/${L[3]}" title="Видеоурок" loading="lazy" allowfullscreen></iframe>` : '';
-  }
-  const ytEl = $('yt');
-  if (ytEl) {
-    ytEl.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(`${lang.name} ${L[0]} урок`);
-  }
 
-  $('note').textContent = lang.note + (lang.lessons.length < 100 ? ` Курс ещё пополняется: сейчас ${lang.lessons.length} из 100 уроков.` : ' Курс содержит полный комплект из 100 подробных уроков.'); $('jump').value = lang.id;
-  $('prev').disabled = lesson === 0; $('next').disabled = lesson === lang.lessons.length - 1;
-  $('done').textContent = d[lesson] ? 'Отменить «изучено»' : 'Отметить изученным';
+  const lesson = lang.lessons[state.lesson];
+  $('ltitle').textContent = `${state.lesson + 1}. ${lesson[0]}`;
+  $('ltext').textContent = lesson[2];
+  $('code').textContent = lesson[1];
+  $('file').textContent = lang.file[0] || 'code';
+
+  const isDone = !!prog[state.lesson];
+  const doneBtn = $('done');
+  doneBtn.textContent = isDone ? '✓ Выучено' : 'Отметить как выученное';
+  doneBtn.style.background = isDone ? '#2ea043' : '';
+  doneBtn.style.color = isDone ? '#fff' : '';
+  doneBtn.onclick = () => {
+    if (!state.progress[lang.id]) state.progress[lang.id] = [];
+    state.progress[lang.id][state.lesson] = !state.progress[lang.id][state.lesson];
+    save();
+    renderLang();
+  };
+
+  $('prev').disabled = state.lesson === 0;
+  $('prev').onclick = () => {
+    if (state.lesson > 0) {
+      state.lesson--;
+      renderLang();
+    }
+  };
+
+  $('next').disabled = state.lesson === lang.lessons.length - 1;
+  $('next').onclick = () => {
+    if (state.lesson < lang.lessons.length - 1) {
+      state.lesson++;
+      renderLang();
+    }
+  };
+
+  $('note').textContent = lang.note;
+
+  // Video search
+  const query = encodeURIComponent(`${lang.name} урок ${lesson[0]}`);
+  $('yt').href = `https://www.youtube.com/results?search_query=${query}`;
+  $('video').innerHTML = '';
+
+  const copyBtn = $('copy');
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(lesson[1]).then(() => {
+      copyBtn.textContent = 'Скопировано!';
+      setTimeout(() => copyBtn.textName = 'Копировать', 1500);
+    });
+  };
+
+  document.querySelectorAll('.back').forEach(a => {
+    a.onclick = (e) => {
+      e.preventDefault();
+      location.hash = '';
+    };
+  });
 }
 
-function route() {
-  const id = location.hash.slice(1), l = LANGS.find(x => x.id === id);
-  $('home').hidden = !!l; $('lang').hidden = !l;
-  if (l) { lang = l; lesson = 0; renderLang(); } else { $('jump').value = ''; renderHome(); }
-  scrollTo(0, 0);
+function handleRoute() {
+  if (location.hash.length > 1) {
+    renderLang();
+  } else {
+    renderHome();
+  }
 }
 
-$('jump').innerHTML = '<option value="">Выбрать язык</option>' + LANGS.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-$('jump').onchange = e => { location.hash = e.target.value; };
-$('chips').innerHTML = '';
-CATS.forEach(c => {
-  const b = document.createElement('button'); b.textContent = c;
-  b.setAttribute('aria-pressed', c === cat);
-  b.onclick = () => { cat = c; [...$('chips').children].forEach(x => x.setAttribute('aria-pressed', x === b)); renderHome(); };
-  $('chips').append(b);
-});
-$('q').oninput = renderHome;
-$('rnd').onclick = () => { location.hash = LANGS[Math.floor(Math.random() * LANGS.length)].id; };
-$('copy').onclick = async () => {
-  try { await navigator.clipboard.writeText(lang.lessons[lesson][1]); $('copy').textContent = 'Скопировано'; }
-  catch { $('copy').textContent = 'Не вышло'; }
-  setTimeout(() => $('copy').textContent = 'Копировать', 1500);
+window.onhashchange = handleRoute;
+
+window.onload = () => {
+  initTheme();
+  initJump();
+  handleRoute();
 };
-$('prev').onclick = () => { lesson--; renderLang(); };
-$('next').onclick = () => { lesson++; renderLang(); };
-$('done').onclick = () => {
-  const d = done[lang.id] || (done[lang.id] = []);
-  d[lesson] = !d[lesson]; store.set('cp-done', done);
-  if (d[lesson] && lesson < lang.lessons.length - 1) lesson++;
-  renderLang();
-};
-const applyTheme = t => { document.documentElement.dataset.theme = t; store.set('cp-theme', t); };
-applyTheme(store.get('cp-theme', matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
-$('theme').onclick = () => applyTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
-addEventListener('keydown', e => {
-  if (e.target.matches('input,select')) return;
-  if (e.key === '/' && !$('home').hidden) { e.preventDefault(); $('q').focus(); }
-  if (!$('lang').hidden) {
-    if (e.key === 'ArrowRight' && lesson < lang.lessons.length - 1) { lesson++; renderLang(); }
-    if (e.key === 'ArrowLeft' && lesson > 0) { lesson--; renderLang(); }
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    const q = $('q');
+    if (q) q.focus();
   }
 });
-addEventListener('hashchange', route);
-route();
