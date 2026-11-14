@@ -97,10 +97,15 @@ h1 {
 .home-head {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 2rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
+}
+
+.home-title-area {
+  flex: 1;
+  min-width: 18rem;
 }
 
 .rank-box {
@@ -108,7 +113,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 1rem;
   padding: .9rem 1.15rem;
-  min-width: 14.5rem;
+  min-width: 15rem;
   display: grid;
   gap: .45rem;
   flex-shrink: 0;
