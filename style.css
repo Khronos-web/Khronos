@@ -247,6 +247,10 @@ h1 {
   display: grid;
   place-items: center;
   font: 800 2.6rem Unbounded, sans-serif;
+  overflow: hidden;
+  padding: 0 .5rem;
+  text-align: center;
+  word-break: break-all;
 }
 
 .card b {
@@ -288,49 +292,63 @@ h1 {
   content: "← ";
 }
 
+/* Исправленный шаговый блок языка (hero) */
 .hero {
   display: flex;
+  align-items: flex-start;
   gap: 2rem;
-  align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap;
 }
 
 .glyph {
-  width: 9rem;
-  height: 9rem;
-  border-radius: 2rem;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 1.5rem;
   background: var(--accent);
   color: var(--on);
   display: grid;
   place-items: center;
-  font: 800 3.6rem Unbounded, sans-serif;
+  font: 800 2.2rem Unbounded, sans-serif;
   flex: none;
+  padding: 0 .5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero > div:not(.glyph) {
+  flex: 1;
+  min-width: 16rem;
 }
 
 #lang h1 {
   color: var(--at);
   margin-bottom: .3rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  word-break: break-word;
 }
 
 .tag {
   font-weight: 600;
-  font-size: 1.2rem;
-  margin: 0 0 .3rem;
+  font-size: 1.1rem;
+  margin: 0 0 .5rem;
 }
 
 .about {
   color: var(--mute);
-  margin: 0 0 1rem;
-  max-width: 55ch;
+  margin: 0 0 1.2rem;
+  max-width: 65ch;
 }
 
+/* Растянутая шкала прогресса */
 .meter {
-  height: .4rem;
-  max-width: 20rem;
+  height: .5rem;
+  width: 100%;
+  max-width: 100%;
   border-radius: 1rem;
   background: var(--line);
   overflow: hidden;
+  margin-top: .5rem;
 }
 
 .small {
@@ -339,7 +357,6 @@ h1 {
   margin: .4rem 0 0;
 }
 
-/* Увеличенный блок урока и кодовой зоны */
 .lesson-box {
   background: var(--card);
   border: 1px solid var(--line);
@@ -364,12 +381,6 @@ h1 {
   font: 800 clamp(1.5rem, 3vw, 2.2rem) Unbounded, sans-serif;
   margin: 0 0 0.5rem;
   color: var(--ink);
-}
-
-.lesson-box .about {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
-  max-width: 100%;
 }
 
 .code {
@@ -439,7 +450,7 @@ pre {
   .glyph {
     width: 6rem;
     height: 6rem;
-    font-size: 2.4rem;
+    font-size: 1.8rem;
   }
 }
 
