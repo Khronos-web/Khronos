@@ -91,7 +91,69 @@ h1 {
 
 .lead {
   color: var(--mute);
-  margin: 0 0 2rem;
+  margin: 0;
+}
+
+.home-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.rank-box {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: .9rem 1.15rem;
+  min-width: 14.5rem;
+  display: grid;
+  gap: .45rem;
+  flex-shrink: 0;
+}
+
+.rank-top {
+  font-size: .78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--mute);
+  text-align: center;
+}
+
+.rank-bar {
+  position: relative;
+  height: 2rem;
+  border-radius: .65rem;
+  background: color-mix(in srgb, #2f81f7 16%, transparent);
+  border: 1px solid color-mix(in srgb, #2f81f7 40%, transparent);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.rank-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  transition: width .45s ease;
+}
+
+.rank-bar span {
+  position: relative;
+  z-index: 1;
+  font: 800 .95rem Unbounded, sans-serif;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .55);
+}
+
+.rank-title {
+  font: 600 .95rem Unbounded, sans-serif;
+  text-align: center;
+  color: var(--ink);
 }
 
 .tools {
@@ -340,6 +402,12 @@ pre {
 .actions button:disabled {
   opacity: .35;
   cursor: default;
+}
+
+@media(max-width: 680px) {
+  .rank-box {
+    width: 100%;
+  }
 }
 
 @media(max-width: 600px) {
